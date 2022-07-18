@@ -11,3 +11,43 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@font-face {
+  font-family: 'Clear Sans';
+  src: url("./fonts/clear-sans/ClearSans-Bold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.board {
+  width: 500px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  background: #bbada0;
+  margin: 30px;
+  border-radius: 10px;
+}
+
+.column {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 95%;
+  justify-content: space-evenly;
+}
+
+.cell {
+  font-family: "Clear Sans", sans-serif;
+  font-size: 55px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90px;
+  width: 90px;
+  background: #eee4da59;
+  border-radius: 4px;
+  color: #776e65;
+}
