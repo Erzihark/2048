@@ -2,13 +2,13 @@ import {React, useState, useEffect, useRef} from "react";
 
 export default function GameBoard(){
     let initial = [];
-    let addToScore = 0;
+    //let addToScore = 0;
 
     const [board, setBoard] = useState(initial);
-    const [score, setScore] = useState(0);
+    // [score, setScore] = useState(0);
     const [gameOver, setGameOver] = useState(false);
     const boardRef = useRef(board);
-    const scoreRef = useRef(score);
+    //const scoreRef = useRef(score);
 
     startGame();
 
@@ -26,7 +26,7 @@ export default function GameBoard(){
     function arrowListener(e){
         let copy = [...boardRef.current];
         //let direction = "";
-        addToScore = scoreRef.current;
+        //addToScore = scoreRef.current;
         switch (e.key){
             case "ArrowUp":
                 for (let column = 0; column < copy.length; column++){
@@ -50,7 +50,7 @@ export default function GameBoard(){
                     }
                     for(let row = 1; row < board.length; row++){ //adds them together
                         if (copy[row][column] === copy[row - 1][column]){
-                            addToScore += copy[row][column] + copy[row - 1][column];
+                            //addToScore += copy[row][column] + copy[row - 1][column];
                             copy[row - 1][column] = copy[row][column] + copy[row - 1][column];
                             copy[row][column] = 0;
                         }
@@ -86,7 +86,7 @@ export default function GameBoard(){
                     }
                     for(let row = board.length - 2; row >= 0; row--){ //adds them together
                         if (copy[row][column] === copy[row + 1][column]){
-                            addToScore += copy[row][column] + copy[row + 1][column];
+                            //addToScore += copy[row][column] + copy[row + 1][column];
                             copy[row + 1][column] = copy[row][column] + copy[row + 1][column];
                             copy[row][column] = 0;
                         }
@@ -118,7 +118,7 @@ export default function GameBoard(){
 
                     for(let column = 1; column < copy.length; column++){ //adds them together
                         if (copy[row][column] === copy[row][column-1]){
-                            addToScore += copy[row][column] + copy[row][column-1];
+                            //addToScore += copy[row][column] + copy[row][column-1];
                             copy[row][column-1] = copy[row][column] + copy[row][column-1];
                             copy[row][column] = 0;
                         }
@@ -149,7 +149,7 @@ export default function GameBoard(){
                     }
                     for(let column = copy.length - 2; column >= 0; column--){ //adds them together
                         if (copy[row][column] === copy[row][column+1]){
-                            addToScore += copy[row][column] + copy[row][column+1];
+                            //addToScore += copy[row][column] + copy[row][column+1];
                             copy[row][column+1] = copy[row][column] + copy[row][column+1];
                             copy[row][column] = 0;
                         }
@@ -165,7 +165,7 @@ export default function GameBoard(){
                 break;
         }
 
-        setScore(addToScore, console.log(score, addToScore));
+        //setScore(addToScore, console.log(score, addToScore));
         addNumberToRandomTile("right");
     }
 
@@ -208,17 +208,14 @@ export default function GameBoard(){
 
     function addNumberToRandomTile(direction){
         let copy = [...board];
-        let repeat = 2;
-        for (let i = 0; i < repeat; i++){
-            let arr = chooseRandomTile(copy);
-            if (arr){
-                copy[arr[0]][arr[1]] = Math.random() < 0.9 ? 2 : 4;
-                setBoard(copy);
-            } else {
-                if (checkForGameOver(board)){
-                    setGameOver(true);
-                } else setBoard(copy);
-            }
+        let arr = chooseRandomTile(copy);
+        if (arr){
+            copy[arr[0]][arr[1]] = Math.random() < 0.9 ? 2 : 4;
+            setBoard(copy);
+        } else {
+            if (checkForGameOver(board)){
+                setGameOver(true);
+            } else setBoard(copy);
         }
     }
 
@@ -303,7 +300,9 @@ export default function GameBoard(){
 
     useEffect(() => {
         window.addEventListener("keydown", arrowListener);
-        addNumberToRandomTile(null);
+        addNumberToRandomTile();
+        addNumberToRandomTile();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(()=>{
