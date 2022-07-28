@@ -163,6 +163,8 @@ export default function GameBoard(){
                 }
                 //direction = "right";
                 break;
+            default:
+                break;
         }
 
         //setScore(addToScore, console.log(score, addToScore));
