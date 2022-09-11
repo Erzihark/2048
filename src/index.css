@@ -9,6 +9,10 @@ body {
   color: #776e65;
 }
 
+html, body {
+  height: 100%; overflow: hidden
+}
+
 :root{
   --display-width: 700px;
 }
