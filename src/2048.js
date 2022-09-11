@@ -1,4 +1,7 @@
 import {React, useState, useEffect, useRef} from "react";
+import {moveDown, moveLeft, moveRight, moveUp} from "./movement";
+
+
 
 export default function GameBoard(){
     let initial = [];
@@ -9,7 +12,6 @@ export default function GameBoard(){
     const [gameOver, setGameOver] = useState(false);
     const boardRef = useRef(board);
     //const scoreRef = useRef(score);
-
     startGame();
 
     function startGame(){
@@ -22,153 +24,81 @@ export default function GameBoard(){
         initial.push([8192, 16384, 2, 0]);*/
     }
 
+    let startH = null;
+    let startV = null;
+    const startListener = function tStartListener(event){
+        if (event.touches.length === 1){
+            startH = event.touches.item(0).clientX;
+            startV = event.touches.item(0).clientY;
+        } else{
+            startH = null;
+            startV = null;
+        }
+    }
 
-    function arrowListener(e){
+    const endListener = async function tEndListener(event){
         let copy = [...boardRef.current];
-        //let direction = "";
+        let offset = 100;
+        let moved = false;
+
+        if (startH){
+            let end = event.changedTouches.item(0).clientX;
+
+            if(end > startH + offset){
+                moved = await moveRight(copy);
+                if (moved){
+                    await addNumberToRandomTile();
+                }
+            }
+            if(end < startH - offset){
+                moved = await moveLeft(copy);
+                if (moved){
+                    await addNumberToRandomTile();
+                }
+            }
+        }
+        if(startV){
+            let end = event.changedTouches.item(0).clientY;
+
+            if(end < startV - offset){
+                moved = await moveUp(copy);
+                if (moved){
+                    await addNumberToRandomTile();
+                }
+            }
+            if(end > startV + offset){
+                moved = await moveDown(copy);
+                if (moved){
+                    await addNumberToRandomTile();
+                }
+            }
+        }
+    }
+
+    async function arrowListener(e){
+        let copy = [...boardRef.current];
+        let moved = false;
         //addToScore = scoreRef.current;
         switch (e.key){
             case "ArrowUp":
-                for (let column = 0; column < copy.length; column++){
-                    let zcount = 0;
-                    let colArray = [];
-                    //creates an array with the first element of each row (column)
-                    for (let row = 0; row < copy.length; row++){
-                        colArray.push(copy[row][0]);
-                    }
-                    if (colArray.includes(0)){ //only moves if theres space
-                        for(let row = 0; row < board.length; row++){
-                            if (copy[row][column] === 0){
-                                zcount++;
-                            } else {
-                                if (zcount > 0){
-                                    copy[row - zcount][column] = copy[row][column];
-                                    copy[row][column] = 0;
-                                }
-                            }
-                        }
-                    }
-                    for(let row = 1; row < board.length; row++){ //adds them together
-                        if (copy[row][column] === copy[row - 1][column]){
-                            //addToScore += copy[row][column] + copy[row - 1][column];
-                            copy[row - 1][column] = copy[row][column] + copy[row - 1][column];
-                            copy[row][column] = 0;
-                        }
-                    }
-                    for(let row = 1; row < board.length; row++){ //slides them after adding
-                        if (copy[row - 1][column] === 0){
-                            copy[row - 1][column] = copy[row][column];
-                            copy[row][column] = 0;
-                        }
-                    }
-                }
-                //direction = "up";
+                moved = await moveUp(copy);
                 break;
             case "ArrowDown":
-                for (let column = 0; column < copy.length; column++){
-                    let zcount = 0;
-                    let colArray = [];
-                    //creates an array with the first element of each row (column)
-                    for (let row = 0; row < copy.length; row++){
-                        colArray.push(copy[row][0]);
-                    }
-                    if (colArray.includes(0)){ //only moves if theres space
-                        for(let row = board.length - 1; row >= 0; row--){
-                            if (copy[row][column] === 0){
-                                zcount++;
-                            } else {
-                                if (zcount > 0){
-                                    copy[row + zcount][column] = copy[row][column];
-                                    copy[row][column] = 0;
-                                }
-                            }
-                        }
-                    }
-                    for(let row = board.length - 2; row >= 0; row--){ //adds them together
-                        if (copy[row][column] === copy[row + 1][column]){
-                            //addToScore += copy[row][column] + copy[row + 1][column];
-                            copy[row + 1][column] = copy[row][column] + copy[row + 1][column];
-                            copy[row][column] = 0;
-                        }
-                    }
-                    for(let row = board.length - 2; row >= 0; row--){ //slides them after adding
-                        if (copy[row + 1][column] === 0){
-                            copy[row + 1][column] = copy[row][column];
-                            copy[row][column] = 0;
-                        }
-                    }
-                }
-                //direction ="down";
+                moved = await moveDown(copy);
                 break;
             case "ArrowLeft":
-                for (let row = 0; row < copy.length; row++){
-                    let zcount = 0;
-                    if (copy[row].includes(0)){ //only moves if theres space
-                        for(let column = 0; column < copy.length; column++){
-                            if (copy[row][column] === 0){
-                                zcount++;
-                            } else {
-                                if (zcount > 0){
-                                    copy[row][column - zcount] = copy[row][column];
-                                    copy[row][column] = 0;
-                                }
-                            }
-                        }
-                    }
-
-                    for(let column = 1; column < copy.length; column++){ //adds them together
-                        if (copy[row][column] === copy[row][column-1]){
-                            //addToScore += copy[row][column] + copy[row][column-1];
-                            copy[row][column-1] = copy[row][column] + copy[row][column-1];
-                            copy[row][column] = 0;
-                        }
-                    }
-                    for(let column = 1; column < copy.length; column++){ //slides them after adding
-                        if (copy[row][column-1] === 0){
-                            copy[row][column-1] = copy[row][column];
-                            copy[row][column] = 0;
-                        }
-                    }
-                }
-                //direction = "left";
+                moved = await moveLeft(copy);
                 break;
             case "ArrowRight":
-                for (let row = 0; row < copy.length; row++){
-                    let zcount = 0;
-                    if (copy[row].includes(0)){ //only moves if theres space
-                        for(let column = copy.length - 1; column >= 0; column--){
-                            if (copy[row][column] === 0){
-                                zcount++;
-                            } else {
-                                if (zcount > 0){
-                                    copy[row][column + zcount] = copy[row][column];
-                                    copy[row][column] = 0;
-                                }
-                            }
-                        }
-                    }
-                    for(let column = copy.length - 2; column >= 0; column--){ //adds them together
-                        if (copy[row][column] === copy[row][column+1]){
-                            //addToScore += copy[row][column] + copy[row][column+1];
-                            copy[row][column+1] = copy[row][column] + copy[row][column+1];
-                            copy[row][column] = 0;
-                        }
-                    }
-                    for(let column = copy.length - 2; column >= 0; column--){ //slides them after adding
-                        if (copy[row][column+1] === 0){
-                            copy[row][column+1] = copy[row][column];
-                            copy[row][column] = 0;
-                        }
-                    }
-                }
-                //direction = "right";
+                moved = await moveRight(copy);
                 break;
             default:
                 break;
         }
-
         //setScore(addToScore, console.log(score, addToScore));
-        addNumberToRandomTile("right");
+        if (moved){
+            await addNumberToRandomTile();
+        }
     }
 
     function placeButtons(className){
@@ -192,7 +122,7 @@ export default function GameBoard(){
         return (
             <div className={"board"}>
                 {board.map((col) => {
-                    return <div className={"column"}>
+                    return <div className={`column`}>
                         { placeCell(col) }
                     </div>
                 })}
@@ -202,22 +132,34 @@ export default function GameBoard(){
 
     function placeCell(col){
         return(
-            col.map((val) => {
-                return <div className = {`cell cell-val-${val}`}>{val}</div>
+            col.map((val, i) => {
+                return (
+                    <>
+                        <div id={`${board.indexOf(col)}-${i}`} className = {`cell cell-val-${val}`}>
+                            {val}
+                        </div>
+                        <div style={{left: `${(i * 25) + (i > 1 ? 1 : 2)}%`}} className = {`cell ghost cell-val-0`}></div>
+                    </>
+                )
             })
         )
     }
 
-    function addNumberToRandomTile(direction){
+    const addNumberToRandomTile = ()=>{
         let copy = [...board];
         let arr = chooseRandomTile(copy);
+
         if (arr){
+            document.getElementById(`${arr[0]}-${arr[1]}`).classList.add("spawn-animation");
             copy[arr[0]][arr[1]] = Math.random() < 0.9 ? 2 : 4;
             setBoard(copy);
         } else {
             if (checkForGameOver(board)){
                 setGameOver(true);
-            } else setBoard(copy);
+            } else {
+                document.getElementById(`${arr[0]}-${arr[1]}`).classList.add("spawn-animation");
+                setBoard(copy);
+            }
         }
     }
 
@@ -302,6 +244,8 @@ export default function GameBoard(){
 
     useEffect(() => {
         window.addEventListener("keydown", arrowListener);
+        window.addEventListener("touchstart", startListener);
+        window.addEventListener("touchend", endListener);
         addNumberToRandomTile();
         addNumberToRandomTile();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -328,6 +272,7 @@ export default function GameBoard(){
                 </div>
             </div>
             {placeRows()}
+
             <div className={"instructions"}>
                 <strong>HOW TO PLAY</strong>: Use your <strong>arrow keys</strong> to move the tiles.<br/>
                 Tiles with the same number <strong>merge into one</strong> when they touch.<br/>
